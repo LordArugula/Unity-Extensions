@@ -1,5 +1,3 @@
-# EditorInjector
- Allows injecting dependencies in the Unity Inspector to fields with the SerializeReference Attribute. 
 # Unity Attributes
  Provides custom attributes to work with the Unity game engine.
  
