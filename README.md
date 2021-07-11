@@ -78,3 +78,7 @@ public class Test : MonoBehaviour
     public string playerTag;
 }
 ```
+
+## Installing
+You can install this through the Unity Package Manager using the git url.
+`https://github.com/LordArugula/Unity-Extensions.git`
