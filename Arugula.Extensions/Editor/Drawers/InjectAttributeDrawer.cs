@@ -20,7 +20,8 @@ namespace Arugula.Extensions.Editor
 
             if (IsPropertyTypeManagedReference(property))
             {
-                List<Type> injectableTypes = GetInjectableTypes(fieldInfo.FieldType);
+                Type fieldType = GetFieldType();
+                List<Type> injectableTypes = GetInjectableTypes(fieldType);
 
                 object injectedObject = GetInjectedObject(property);
                 int selectedIndex = 0;
@@ -45,6 +46,22 @@ namespace Arugula.Extensions.Editor
             EditorGUI.EndProperty();
         }
 
+        private Type GetFieldType()
+        {
+            if (typeof(System.Collections.IList).IsAssignableFrom(fieldInfo.FieldType))
+            {
+                if (fieldInfo.FieldType.IsArray)
+                {
+                    return fieldInfo.FieldType.GetElementType();
+                }
+                else
+                {
+                    return fieldInfo.FieldType.GenericTypeArguments[0];
+                }
+            }
+            return fieldInfo.FieldType;
+        }
+
         private bool IsPropertyTypeManagedReference(SerializedProperty property)
         {
             return property.propertyType == SerializedPropertyType.ManagedReference;
@@ -52,8 +69,16 @@ namespace Arugula.Extensions.Editor
 
         private object GetInjectedObject(SerializedProperty property)
         {
-            FieldInfo field = base.fieldInfo;
-            return field.GetValue(property.serializedObject.targetObject);
+            object value = fieldInfo.GetValue(property.serializedObject.targetObject);
+            if (typeof(System.Collections.IList).IsAssignableFrom(fieldInfo.FieldType))
+            {
+                int start = property.propertyPath.LastIndexOf('[') + 1;
+                string arrayIndex = property.propertyPath.Substring(start, property.propertyPath.Length - start - 1);
+                System.Collections.IList list = (System.Collections.IList)value;
+                value = list[int.Parse(arrayIndex)];
+            }
+
+            return value;
         }
 
         private object CreateInstance(Type type)
@@ -82,12 +107,12 @@ namespace Arugula.Extensions.Editor
             return options;
         }
 
-        private List<Type> GetInjectableTypes(Type baseType)
+        private List<Type> GetInjectableTypes(Type fieldType)
         {
             List<Type> types = new List<Type>();
             types.Add(null);
 
-            TypeCache.TypeCollection typeCollection = TypeCache.GetTypesDerivedFrom(baseType);
+            TypeCache.TypeCollection typeCollection = TypeCache.GetTypesDerivedFrom(fieldType);
             for (int i = 0; i < typeCollection.Count; i++)
             {
                 if (IsTypeInjectable(typeCollection[i]))
