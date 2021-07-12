@@ -71,6 +71,9 @@ public class Test : MonoBehaviour
 {
     [Layer]
     public int groundLayer;
+
+    [Layer]
+    public string waterLayer;
 }
 ```
 
