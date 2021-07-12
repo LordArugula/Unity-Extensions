@@ -20,7 +20,7 @@ public class FooService : IService { }
 
 public class BarService : IService { }
 
-public class Test : MonoBehaviour
+public class InjectAttributeDemo : MonoBehaviour
 {
     [SerializeReference]
     [Inject]
@@ -34,27 +34,27 @@ Prevents editing fields via the Inspector during Play Mode, Edit Mode, or both.
 ```cs
 using Arugula.Extensions;
 
-public class Test : MonoBehaviour
+public class ReadOnlyAttributeDemo : MonoBehaviour
 {
     [ReadOnly]
     public GameObject readOnlyAlways;
-    [ReadOnly(PlayMode = true)]
+    [ReadOnly(playMode: true)]
     public int readOnlyDuringPlayMode;
-    [ReadOnly(EditMode = true)]
-    public float readOnlyDuringEditMode
+    [ReadOnly(editMode: true)]
+    public float readOnlyDuringEditMode;
 }
 ```
 
 ### [SceneAttribute]
-Makes an integer field a scene selection field.
+Makes integer or string fields a scene selection field.
 
 ```cs
 using Arugula.Extensions;
 
-public class Test : MonoBehaviour
+public class SceneAttributeDemo : MonoBehaviour
 {
     [Scene]
-    public int mainScene; 
+    public int mainScene;
 
     [Scene]
     public string otherScene;
@@ -67,7 +67,7 @@ Makes integer or string fields a layer selection field.
 ```cs
 using Arugula.Extensions;
 
-public class Test : MonoBehaviour
+public class LayerAttributeDemo : MonoBehaviour
 {
     [Layer]
     public int groundLayer;
@@ -78,12 +78,12 @@ public class Test : MonoBehaviour
 ```
 
 ### [TagAttribute]
-Makes a string field a tag selection field.
+Makes string fields a tag selection field.
 
 ```cs
 using Arugula.Extensions;
 
-public class Test : MonoBehaviour
+public class TagAttributeDemo : MonoBehaviour
 {
     [Tag]
     public string playerTag;
@@ -96,11 +96,12 @@ Restricts a GameObject or Component field to only accept prefab assets.
 ```cs
 using Arugula.Extensions;
 
-public class Test : MonoBehaviour
+public class PrefabAttributeDemo : MonoBehaviour
 {
     [Prefab]
     public GameObject player;
 
-    public 
+    [Prefab]
+    public Rigidbody projectile;
 }
 ```
