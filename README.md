@@ -89,3 +89,18 @@ public class Test : MonoBehaviour
     public string playerTag;
 }
 ```
+
+### [PrefabAttribute]
+Restricts a GameObject or Component field to only accept prefab assets.
+
+```cs
+using Arugula.Extensions;
+
+public class Test : MonoBehaviour
+{
+    [Prefab]
+    public GameObject player;
+
+    public 
+}
+```
