@@ -10,7 +10,8 @@ namespace Arugula.Extensions.Editor
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (property.propertyType == SerializedPropertyType.Integer)
+            if (property.propertyType == SerializedPropertyType.Integer
+            || property.propertyType == SerializedPropertyType.String)
             {
                 DoSceneField(position, property, label);
             }
@@ -26,7 +27,10 @@ namespace Arugula.Extensions.Editor
             int sceneIndex = GetSceneIndex(property);
             if (!IsValidSceneIndex(sceneIndex))
             {
-                property.intValue = 0;
+                if (IsIntegerProperty(property))
+                {
+                    property.intValue = 0;
+                }
                 sceneIndex = 0;
             }
             string currentSceneName = GetSceneNameAtIndex(sceneIndex);
@@ -43,7 +47,7 @@ namespace Arugula.Extensions.Editor
 
         private int GetSceneIndex(SerializedProperty property)
         {
-            return property.propertyType == SerializedPropertyType.Integer
+            return IsIntegerProperty(property)
                 ? property.intValue
                 : GetSceneIndexFromName(property.stringValue);
         }
@@ -105,8 +109,20 @@ namespace Arugula.Extensions.Editor
         private void SetSceneIndex(object userData)
         {
             SceneInfo sceneInfo = (SceneInfo)userData;
-            sceneInfo.Property.intValue = sceneInfo.SceneIndex;
+            if (IsIntegerProperty(sceneInfo.Property))
+            {
+                sceneInfo.Property.intValue = sceneInfo.SceneIndex;
+            }
+            else
+            {
+                sceneInfo.Property.stringValue = GetSceneNameAtIndex(sceneInfo.SceneIndex);
+            }
             sceneInfo.Property.serializedObject.ApplyModifiedProperties();
+        }
+
+        private bool IsIntegerProperty(SerializedProperty property)
+        {
+            return property.propertyType == SerializedPropertyType.Integer;
         }
     }
 

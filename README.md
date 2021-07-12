@@ -1,6 +1,11 @@
 # Unity Attributes
- Provides custom attributes to work with the Unity game engine.
- 
+Provides custom attributes to work with the Unity game engine.
+
+## Installing
+You can install this package through the Unity Package Manager using the git url.
+
+`https://github.com/LordArugula/Unity-Extensions.git`
+
 ## Attributes
 
 ### [InjectAttribute]
@@ -32,7 +37,7 @@ using Arugula.Extensions;
 public class Test : MonoBehaviour
 {
     [ReadOnly]
-    public GameObject readOnlyGameObject;
+    public GameObject readOnlyAlways;
     [ReadOnly(PlayMode = true)]
     public int readOnlyDuringPlayMode;
     [ReadOnly(EditMode = true)]
@@ -82,3 +87,13 @@ public class Test : MonoBehaviour
 ## Installing
 You can install this through the Unity Package Manager using the git url.
 `https://github.com/LordArugula/Unity-Extensions.git`
+    // PlainOldData class is not serializable and will not be drawn in the inspector, but
+    // the RequireReference attribute will still apply.
+    [RequireReference]
+    public PlainOldData plainOldData;
+    // SerializableData class is serializable and the RequireReference will not apply.
+    // Read more: [https://docs.unity3d.com/Manual/script-Serialization.html#ClassSerialized]
+    [RequireReference]
+    public SerializableData serializableData;
+}
+```
