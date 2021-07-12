@@ -55,6 +55,9 @@ public class Test : MonoBehaviour
 {
     [Scene]
     public int mainScene; 
+
+    [Scene]
+    public string otherScene;
 }
 ```
 
@@ -81,19 +84,5 @@ public class Test : MonoBehaviour
 {
     [Tag]
     public string playerTag;
-}
-```
-
-## Installing
-You can install this through the Unity Package Manager using the git url.
-`https://github.com/LordArugula/Unity-Extensions.git`
-    // PlainOldData class is not serializable and will not be drawn in the inspector, but
-    // the RequireReference attribute will still apply.
-    [RequireReference]
-    public PlainOldData plainOldData;
-    // SerializableData class is serializable and the RequireReference will not apply.
-    // Read more: [https://docs.unity3d.com/Manual/script-Serialization.html#ClassSerialized]
-    [RequireReference]
-    public SerializableData serializableData;
 }
 ```
