@@ -54,7 +54,7 @@ namespace Arugula.Extensions.Editor
                 {
                     return fieldInfo.FieldType.GetElementType();
                 }
-                else
+                else if (fieldInfo.FieldType.GenericTypeArguments.Length == 1)
                 {
                     return fieldInfo.FieldType.GenericTypeArguments[0];
                 }
@@ -72,10 +72,14 @@ namespace Arugula.Extensions.Editor
             object value = fieldInfo.GetValue(property.serializedObject.targetObject);
             if (typeof(System.Collections.IList).IsAssignableFrom(fieldInfo.FieldType))
             {
-                int start = property.propertyPath.LastIndexOf('[') + 1;
-                string arrayIndex = property.propertyPath.Substring(start, property.propertyPath.Length - start - 1);
-                System.Collections.IList list = (System.Collections.IList)value;
-                value = list[int.Parse(arrayIndex)];
+                if (fieldInfo.FieldType.IsArray || fieldInfo.FieldType.GenericTypeArguments.Length == 1)
+                {
+                    System.Collections.IList list = (System.Collections.IList)value;
+
+                    int start = property.propertyPath.LastIndexOf('[') + 1;
+                    string arrayIndex = property.propertyPath.Substring(start, property.propertyPath.Length - start - 1);
+                    value = list[int.Parse(arrayIndex)];
+                }
             }
 
             return value;
