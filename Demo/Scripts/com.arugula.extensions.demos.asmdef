@@ -1,0 +1,16 @@
+{
+    "name": "com.arugula.extensions.demos",
+    "rootNamespace": "Arugula.Extensions.Demos",
+    "references": [
+        "GUID:6120c7c0ff62e9948baff0991cbf5b0d"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

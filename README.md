@@ -22,8 +22,8 @@ public class BarService : IService { }
 
 public class InjectAttributeDemo : MonoBehaviour
 {
-    [SerializeReference]
     [Inject]
+    [SerializeReference]
     public IService service;
 }
 ```
@@ -119,3 +119,83 @@ public class PrefabAttributeDemo : MonoBehaviour
 ```
 
 ![PrefabAttribute gif](Documentation~/images/Prefab.gif)
+
+## Reference Attributes
+These attributes help stop you from leaving a reference field unassigned. 
+The RequireReference attribut forces you to assign the field before entering Play Mode.
+The others are named similarly to some of Unity's api. Those automatically assign a reference to an object or simply leaving a warning in the Console Window if they are not able to find anything. References ge-t assigned whenever Unity reloads, the Hierarchy changes, or an asset is imported.
+
+### [RequireReferenceAttribute]
+Forces a reference type field to be assigned before entering Play Mode.
+
+```cs
+using Arugula.Extensions;
+
+public class RequireReferenceAttributeDemo : MonoBehaviour
+{
+    [RequireReference]
+    public Animator animator;
+
+    [RequireReference]
+    public GameObject prefab;
+
+    [RequireReference, SerializeReference, Inject]
+    public IService list;
+}
+```
+
+### [FindGameObjectAttribute]
+Searches for a GameObject in the scene and assigns it.
+
+```cs
+using Arugula.Extensions;
+
+public class FindGameObjectAttributeDemo : MonoBehaviour
+{
+    [FindGameObject(Tag = "Player")]
+    public GameObject player;
+
+    [FindGameObject(Name = "MainCamera")]
+    public Camera mainCamera;
+
+    [FindGameObject(CreateInstance = true)]
+    public GameManager gameManager;
+}
+```
+
+### [FindAssetAttribute]
+Searches for an asset and assigns it.
+
+```cs
+using Arugula.Extensions;
+
+public class FindAssetAttributeDemo : MonoBehaviour
+{
+    [FindAsset(Name = "Player")]
+    public GameObject player;
+
+    [FindAsset(Name = "Bullet", CreateAsset = true)]
+    public Rigidbody bullet;
+
+    [FindAsset]
+    public GameManager prefab;
+
+    [FindAsset(CreateAsset = true)]
+    public SomeScriptableObject scriptableObject;
+}
+
+```
+
+### [GetComponentAttribute]
+Gets the a Component on the GameObject or its children and assigns it.
+
+```cs
+public class GetComponentAttributeDemo : MonoBehaviour
+{
+    [GetComponent(AddComponent = true)]
+    public Rigidbody _rigidbody;
+
+    [GetComponent(IncludeChildren = true)]
+    public Animator _animator;
+}
+```
