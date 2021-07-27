@@ -1,16 +1,17 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Arugula.Extensions.Demos
 {
     public class RequireReferenceAttributeDemo : MonoBehaviour
     {
-        [RequireReference]
-        public Animator animator;
+        [RequireReference, SerializeReference]
+        private Animator animator;
 
         [RequireReference, Prefab]
-        public GameObject prefab;
+        public List<GameObject> prefabs;
 
         [RequireReference, SerializeReference, Inject]
-        public IService list;
+        private IService service;
     }
 }

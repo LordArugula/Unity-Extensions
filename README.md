@@ -11,6 +11,8 @@ You can install this package through the Unity Package Manager using the git url
 ### [InjectAttribute]
 Allows injecting dependencies via the Inspector to fields decorated with the [SerializeReference](https://docs.unity3d.com/Documentation/ScriptReference/SerializeReference.html) attribute.
 
+Any limitations of the [SerializeReference] attribute applies to the [Inject] attribute as well. For example, applying changes to a prefab instance is not supported due to the way Unity serializes prefab modifications. See [issue](https://issuetracker.unity3d.com/issues/cannot-override-type-of-serializedreference-fields-in-prefab-instances).
+
 ```cs
 using Arugula.Extensions;
 
@@ -25,6 +27,11 @@ public class InjectAttributeDemo : MonoBehaviour
     [Inject]
     [SerializeReference]
     public IService service;
+
+    // Works on lists and arrays
+    [Inject]
+    [SerializeReference]
+    public List<IService> services;
 }
 ```
 
@@ -121,9 +128,11 @@ public class PrefabAttributeDemo : MonoBehaviour
 ![PrefabAttribute gif](Documentation~/images/Prefab.gif)
 
 ## Reference Attributes
-These attributes help stop you from leaving a reference field unassigned. 
-The RequireReference attribut forces you to assign the field before entering Play Mode.
-The others are named similarly to some of Unity's api. Those automatically assign a reference to an object or simply leaving a warning in the Console Window if they are not able to find anything. References ge-t assigned whenever Unity reloads, the Hierarchy changes, or an asset is imported.
+These attributes help stop you from leaving a reference field unassigned. They only apply to fields on a type deriving from MonoBehaviour or ScriptableObject. 
+
+The [RequireReference] attribute forces you to assign the field before entering Play Mode.
+
+The [GetComponent], [FindGameObject], and [FindAsset] attributes automatically search for an object and assigns it to the field with the attribute. If nothing is found, they leave a warning in the Console Window. References get assigned whenever Unity reloads, the Hierarchy changes, or an asset is imported.
 
 ### [RequireReferenceAttribute]
 Forces a reference type field to be assigned before entering Play Mode.
@@ -141,6 +150,15 @@ public class RequireReferenceAttributeDemo : MonoBehaviour
 
     [RequireReference, SerializeReference, Inject]
     public IService list;
+
+    public Test test;
+}
+
+public class Test
+{
+    // RequireReference does nothing in this case
+    [RequireReference]
+    public GameObject gameObject;
 }
 ```
 
@@ -155,7 +173,7 @@ public class FindGameObjectAttributeDemo : MonoBehaviour
     [FindGameObject(Tag = "Player")]
     public GameObject player;
 
-    [FindGameObject(Name = "MainCamera")]
+    [FindGameObject(Name = "Main Camera")]
     public Camera mainCamera;
 
     [FindGameObject(CreateInstance = true)]
@@ -171,6 +189,8 @@ using Arugula.Extensions;
 
 public class FindAssetAttributeDemo : MonoBehaviour
 {
+    // Component and GameObject fields search for a 
+    // prefab asset with the Component, if applicable.
     [FindAsset(Name = "Player")]
     public GameObject player;
 
@@ -180,6 +200,7 @@ public class FindAssetAttributeDemo : MonoBehaviour
     [FindAsset]
     public GameManager prefab;
 
+    // CreateAsset creates a default asset for ScriptableObjects and Components and GameObjects.
     [FindAsset(CreateAsset = true)]
     public SomeScriptableObject scriptableObject;
 }
@@ -187,7 +208,7 @@ public class FindAssetAttributeDemo : MonoBehaviour
 ```
 
 ### [GetComponentAttribute]
-Gets the a Component on the GameObject or its children and assigns it.
+Gets a Component on the GameObject or its children and assigns it.
 
 ```cs
 public class GetComponentAttributeDemo : MonoBehaviour

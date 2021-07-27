@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: SomeScriptableObject
   m_EditorClassIdentifier: 
   prefab: {fileID: 3082380037356020763, guid: e7b1613848bd38b49a089aafd47507aa, type: 3}
+  required: {fileID: 3082380037356020763, guid: e7b1613848bd38b49a089aafd47507aa, type: 3}

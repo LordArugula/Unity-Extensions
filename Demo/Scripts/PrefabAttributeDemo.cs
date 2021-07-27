@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Arugula.Extensions.Demos
@@ -9,5 +10,8 @@ namespace Arugula.Extensions.Demos
 
         [Prefab]
         public Rigidbody projectile;
+
+        [SerializeField, Prefab]
+        private List<Transform> prefabs;
     }
 }

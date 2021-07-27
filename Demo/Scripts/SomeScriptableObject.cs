@@ -6,5 +6,8 @@ namespace Arugula.Extensions.Demos
     {
         [FindAsset]
         public GameObject prefab;
+
+        [RequireReference]
+        public GameObject required;
     }
 }

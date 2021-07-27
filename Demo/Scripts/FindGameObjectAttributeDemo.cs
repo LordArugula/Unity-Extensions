@@ -7,7 +7,7 @@ namespace Arugula.Extensions.Demos
         [FindGameObject(Tag = "Player")]
         public GameObject player;
 
-        [FindGameObject(Name = "MainCamera")]
+        [FindGameObject(Name = "Main Camera")]
         public Camera mainCamera;
 
         [FindGameObject(CreateInstance = true)]
