@@ -44,8 +44,8 @@ namespace Arugula.Extensions.Editor
             for (int i = 0; i < fields.Count; i++)
             {
                 FieldInfo fieldInfo = fields[i];
-                if (fieldInfo.DeclaringType.IsSubclassOf(typeof(Component))
-                    || fieldInfo.DeclaringType.IsSubclassOf(typeof(ScriptableObject)))
+                if (TypeUtils.IsComponent(fieldInfo.DeclaringType)
+                    || TypeUtils.IsScriptableObject(fieldInfo.DeclaringType))
                 {
                     if (fieldInfos.ContainsKey(fieldInfo.DeclaringType))
                     {
@@ -83,28 +83,23 @@ namespace Arugula.Extensions.Editor
         private static void CheckMissingReferences(UnityEngine.Object obj, FieldInfo fieldInfo)
         {
             object value = fieldInfo.GetValue(obj);
-            if (typeof(IList).IsAssignableFrom(fieldInfo.FieldType))
+            if (TypeUtils.IsListOrArray(fieldInfo))
             {
-                HandleListField(obj, fieldInfo, (IList)value);
+                IList list = (IList)value;
+                for (int i = 0; i < list.Count; i++)
+                {
+                    object arrayValue = list[i];
+                    if (arrayValue == null || arrayValue.Equals(null))
+                    {
+                        Debug.LogError($"<color=cyan>{obj.name}</color> must assign <color=cyan>{obj.GetType().Name}</color>.<color=yellow>{fieldInfo.Name}</color>[{i}].", obj);
+                        anyFieldMissingReference = true;
+                    }
+                }
             }
             else if (value == null || value.Equals(null))
             {
-                Debug.LogError($"{obj.name} must assign {obj.GetType().Name}.{fieldInfo.Name}.", obj);
-
+                Debug.LogError($"<color=cyan>{obj.name}</color> must assign <color=yellow>{obj.GetType().Name}</color>.<color=yellow>{fieldInfo.Name}</color>.", obj);
                 anyFieldMissingReference = true;
-            }
-        }
-
-        private static void HandleListField(UnityEngine.Object obj, FieldInfo fieldInfo, IList list)
-        {
-            for (int i = 0; i < list.Count; i++)
-            {
-                object arrayValue = list[i];
-                if (arrayValue == null || arrayValue.Equals(null))
-                {
-                    Debug.LogError($"{obj.name} must assign {obj.GetType().Name}.{fieldInfo.Name}[{i}].", obj);
-                    anyFieldMissingReference = true;
-                }
             }
         }
     }

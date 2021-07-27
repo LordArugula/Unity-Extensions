@@ -39,7 +39,7 @@ namespace Arugula.Extensions.Editor
                     {
                         UnityEngine.Object owner = objectsWithField[o];
 
-                        if (IsFieldReferenceNull(fieldInfo.GetValue(owner)))
+                        if (IsReferenceNull(fieldInfo.GetValue(owner)))
                         {
                             UnityEngine.Object obj = resolver.FindObject(fieldInfo, owner);
                             if (obj != null)
@@ -48,7 +48,7 @@ namespace Arugula.Extensions.Editor
                             }
                             else
                             {
-                                Debug.LogWarning($"Could not assign {fieldInfo.DeclaringType.Name}.{fieldInfo.Name} on {owner.name}.", owner);
+                                Debug.LogWarning($"Could not assign <color=cyan>{fieldInfo.DeclaringType.Name}</color>.<color=yellow>{fieldInfo.Name}</color> on <color=cyan>{owner.name}</color>.", owner);
                             }
                         }
                     }
@@ -60,7 +60,7 @@ namespace Arugula.Extensions.Editor
         {
             if (PrefabUtility.IsPartOfPrefabAsset(owner))
             {
-                PrefabUtility.RecordPrefabInstancePropertyModifications(PrefabUtility.GetNearestPrefabInstanceRoot(owner));
+                PrefabUtility.RecordPrefabInstancePropertyModifications(owner);
             }
             else
             {
@@ -69,41 +69,9 @@ namespace Arugula.Extensions.Editor
             fieldInfo.SetValue(owner, obj);
         }
 
-        private static bool IsFieldReferenceNull(object value)
+        private static bool IsReferenceNull(object value)
         {
             return value == null || value.Equals(null);
-        }
-
-        private static List<FieldInfo> GetFieldInfos(IReferenceResolver resolver)
-        {
-            TypeCache.FieldInfoCollection fieldInfoCollection
-                = TypeCache.GetFieldsWithAttribute(resolver.AttributeType);
-
-            List<FieldInfo> fieldInfos = new List<FieldInfo>(fieldInfoCollection.Count);
-            for (int i = 0; i < fieldInfoCollection.Count; i++)
-            {
-                if (resolver.ValidateAttributeUsage(fieldInfoCollection[i]))
-                {
-                    fieldInfos.Add(fieldInfoCollection[i]);
-                }
-            }
-            return fieldInfos;
-        }
-
-        private static List<IReferenceResolver> GetResolvers()
-        {
-            TypeCache.TypeCollection types = TypeCache.GetTypesDerivedFrom(typeof(IReferenceResolver));
-            List<IReferenceResolver> validResolverTypes = new List<IReferenceResolver>(types.Count);
-
-            for (int i = 0; i < types.Count; i++)
-            {
-                if (!(types[i].IsAbstract || types[i].IsInterface))
-                {
-                    validResolverTypes.Add(Activator.CreateInstance(types[i]) as IReferenceResolver);
-                }
-            }
-
-            return validResolverTypes;
         }
     }
 }

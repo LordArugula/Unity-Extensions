@@ -15,73 +15,56 @@ namespace Arugula.Extensions.Editor
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            EditorGUI.BeginProperty(position, label, property);
-
-            if (IsPropertyTypeManagedReference(property))
+            if (IsManagedReference(property))
             {
-                Type fieldType = GetFieldType();
+                Type fieldType = GetType(property.managedReferenceFieldTypename);
                 List<Type> injectableTypes = GetInjectableTypes(fieldType);
 
-                object injectedObject = GetInjectedObject(property);
-                int selectedIndex = 0;
-                if (injectedObject != null)
+                int selectedIndex = GetSelectedIndex(injectableTypes, property);
+                int newIndex = DrawTypesDropdown(position, injectableTypes, selectedIndex);
+
+                if (newIndex != selectedIndex)
                 {
-                    selectedIndex = injectableTypes.IndexOf(injectedObject.GetType());
-                }
-
-                float labelWidth = EditorGUIUtility.labelWidth;
-                float lineHeight = EditorGUIUtility.singleLineHeight;
-                Rect popupPosition = new Rect(position.x + labelWidth, position.y, position.width - labelWidth, lineHeight);
-
-                int index = EditorGUI.Popup(popupPosition, selectedIndex, GenerateInjectableOptionsContent(injectableTypes));
-
-                if (index != selectedIndex)
-                {
-                    Inject(property, CreateInstance(injectableTypes[index]));
+                    Inject(property, CreateInstance(injectableTypes[newIndex]));
                 }
             }
             EditorGUI.PropertyField(position, property, label, true);
-
-            EditorGUI.EndProperty();
         }
 
-        private Type GetFieldType()
+        private int GetSelectedIndex(List<Type> injectableTypes, SerializedProperty property)
         {
-            if (typeof(System.Collections.IList).IsAssignableFrom(fieldInfo.FieldType))
+            if (string.IsNullOrEmpty(property.managedReferenceFullTypename))
             {
-                if (fieldInfo.FieldType.IsArray)
-                {
-                    return fieldInfo.FieldType.GetElementType();
-                }
-                else if (fieldInfo.FieldType.GenericTypeArguments.Length == 1)
-                {
-                    return fieldInfo.FieldType.GenericTypeArguments[0];
-                }
+                return 0;
             }
-            return fieldInfo.FieldType;
+
+            Type objectType = GetType(property.managedReferenceFullTypename);
+            if (objectType != null)
+            {
+                return injectableTypes.IndexOf(objectType);
+            }
+            return 0;
         }
 
-        private bool IsPropertyTypeManagedReference(SerializedProperty property)
+        private Type GetType(string typeString)
+        {
+            string[] typeName = typeString.Split(' ');
+            return Type.GetType($"{typeName[1]}, {typeName[0]}");
+        }
+
+        private int DrawTypesDropdown(Rect position, List<Type> injectableTypes, int selectedIndex)
+        {
+            float labelWidth = EditorGUIUtility.labelWidth;
+            float lineHeight = EditorGUIUtility.singleLineHeight;
+            Rect popupPosition = new Rect(position.x + labelWidth, position.y, position.width - labelWidth, lineHeight);
+
+            GUIContent[] displayedOptions = GenerateOptionsContent(injectableTypes);
+            return EditorGUI.Popup(popupPosition, selectedIndex, displayedOptions);
+        }
+
+        private bool IsManagedReference(SerializedProperty property)
         {
             return property.propertyType == SerializedPropertyType.ManagedReference;
-        }
-
-        private object GetInjectedObject(SerializedProperty property)
-        {
-            object value = fieldInfo.GetValue(property.serializedObject.targetObject);
-            if (typeof(System.Collections.IList).IsAssignableFrom(fieldInfo.FieldType))
-            {
-                if (fieldInfo.FieldType.IsArray || fieldInfo.FieldType.GenericTypeArguments.Length == 1)
-                {
-                    System.Collections.IList list = (System.Collections.IList)value;
-
-                    int start = property.propertyPath.LastIndexOf('[') + 1;
-                    string arrayIndex = property.propertyPath.Substring(start, property.propertyPath.Length - start - 1);
-                    value = list[int.Parse(arrayIndex)];
-                }
-            }
-
-            return value;
         }
 
         private object CreateInstance(Type type)
@@ -96,10 +79,9 @@ namespace Arugula.Extensions.Editor
         private void Inject(SerializedProperty property, object injectedObject)
         {
             property.managedReferenceValue = injectedObject;
-            property.serializedObject.ApplyModifiedProperties();
         }
 
-        private GUIContent[] GenerateInjectableOptionsContent(List<Type> injectableTypes)
+        private GUIContent[] GenerateOptionsContent(List<Type> injectableTypes)
         {
             GUIContent[] options = new GUIContent[injectableTypes.Count];
             options[0] = new GUIContent("None");

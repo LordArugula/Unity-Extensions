@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,8 +11,9 @@ namespace Arugula.Extensions.Editor
         {
             if (property.propertyType == SerializedPropertyType.ObjectReference)
             {
-                Rect prefabFieldRect = EditorGUI.PrefixLabel(position, label);
-                property.objectReferenceValue = EditorGUI.ObjectField(prefabFieldRect, property.objectReferenceValue, fieldInfo.FieldType, false);
+                Rect rect = EditorGUI.PrefixLabel(position, label);
+                property.objectReferenceValue
+                    = EditorGUI.ObjectField(rect, property.objectReferenceValue, TypeUtils.GetElementType(fieldInfo), false);
             }
             else
             {
