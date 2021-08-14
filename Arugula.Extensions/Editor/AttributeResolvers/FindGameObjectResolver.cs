@@ -17,7 +17,7 @@ namespace Arugula.Extensions.Editor
             }
 
             FindGameObjectAttribute attr = fieldInfo.GetCustomAttribute<FindGameObjectAttribute>(true);
-            string tag = attr.Tag ?? "Untagged";
+            string tag = attr.Tag;
             string name = attr.Name ?? fieldInfo.FieldType.Name;
 
             Object obj = FindGameObject(fieldInfo, tag, name);
@@ -60,13 +60,21 @@ namespace Arugula.Extensions.Editor
                     go = objects[i] as GameObject;
                 }
 
-                if (go.CompareTag(tag) && go.name.Contains(name))
+                if (go.name == name)
                 {
+                    if (!string.IsNullOrEmpty(tag))
+                    {
+                        if (go.CompareTag(tag))
+                        {
+                            return go;
+                        }
+                        continue;
+                    }
+
                     if (TypeUtils.IsComponent(fieldInfo.FieldType))
                     {
                         return objects[i];
                     }
-                    return go;
                 }
             }
             return null;

@@ -1,6 +1,6 @@
 {
     "name": "unity-extensions",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "displayName": "Arugula.Extensions",
     "description": "Provides custom attributes to work with the Unity game engine.",
     "unity": "2020.3",
