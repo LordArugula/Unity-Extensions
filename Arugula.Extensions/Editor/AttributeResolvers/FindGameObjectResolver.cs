@@ -18,7 +18,7 @@ namespace Arugula.Extensions.Editor
 
             FindGameObjectAttribute attr = fieldInfo.GetCustomAttribute<FindGameObjectAttribute>(true);
             string tag = attr.Tag;
-            string name = attr.Name ?? fieldInfo.FieldType.Name;
+            string name = attr.Name;
 
             Object obj = FindGameObject(fieldInfo, tag, name);
             if (obj != null)
@@ -28,7 +28,10 @@ namespace Arugula.Extensions.Editor
 
             if (attr.CreateInstance)
             {
-                return InstantiateObject(fieldInfo, tag, name);
+                return InstantiateObject(
+                    fieldInfo,
+                    tag ?? "Untagged",
+                    name ?? fieldInfo.FieldType.Name);
             }
 
             return null;
@@ -47,35 +50,36 @@ namespace Arugula.Extensions.Editor
 
         private Object FindGameObject(FieldInfo fieldInfo, string tag, string name)
         {
-            Object[] objects = GameObject.FindObjectsOfType(fieldInfo.FieldType);
+            Object[] objects = GameObject.FindObjectsOfType(fieldInfo.FieldType, true);
             for (int i = 0; i < objects.Length; i++)
             {
-                GameObject go;
+                GameObject gameObject;
                 if (TypeUtils.IsComponent(fieldInfo.FieldType))
                 {
-                    go = (objects[i] as Component).gameObject;
+                    gameObject = (objects[i] as Component).gameObject;
                 }
                 else
                 {
-                    go = objects[i] as GameObject;
+                    gameObject = objects[i] as GameObject;
                 }
 
-                if (go.name == name)
+                if (!string.IsNullOrEmpty(tag)
+                    && !gameObject.CompareTag(tag))
                 {
-                    if (!string.IsNullOrEmpty(tag))
-                    {
-                        if (go.CompareTag(tag))
-                        {
-                            return go;
-                        }
-                        continue;
-                    }
-
-                    if (TypeUtils.IsComponent(fieldInfo.FieldType))
-                    {
-                        return objects[i];
-                    }
+                    continue;
                 }
+
+                if (!string.IsNullOrEmpty(name)
+                    && !gameObject.name.Equals(name, System.StringComparison.CurrentCultureIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (TypeUtils.IsComponent(fieldInfo.FieldType))
+                {
+                    return objects[i];
+                }
+                return gameObject;
             }
             return null;
         }
